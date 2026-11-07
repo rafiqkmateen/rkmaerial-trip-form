@@ -1,0 +1,13 @@
+name = "trip-request-form"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+not_found_handling = "none"
+
+[vars]
+SHEET_TAB = "Form Responses 1"
+TIMEZONE = "America/New_York"
+# Secrets (never in this file): GOOGLE_SA_KEY, SHEET_ID, TURNSTILE_SECRET, PREFILL

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
+<title>RKMAerial | Trip request</title>
+<link rel="icon" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="langbar"><select id="lang" aria-label="Language"></select></div>
+  <div class="logo-wrap"><img src="logo.png" alt="RKMAerial" width="240" height="124"></div>
+</header>
+<main id="main">
+  <div class="intro">
+    <h1 data-i18n>Trip request</h1>
+    <p data-i18n>Tell us about your trip and we will send you a free price comparison. You may answer in any language.</p>
+    <p class="privacy" data-i18n>Please do not type passport, card or bank numbers.</p>
+  </div>
+  <form id="form" novalidate autocomplete="on"></form>
+  <section id="thanks" class="card thanks" hidden tabindex="-1">
+    <h2 data-i18n>Thank you</h2>
+    <p data-i18n>We received your request. We will email you your price comparison.</p>
+  </section>
+  <noscript><p class="card">This form needs JavaScript. Please turn it on and reload.</p></noscript>
+</main>
+<footer><p>RKMAerial</p></footer>
+<script src="config.js"></script>
+<script src="schema.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

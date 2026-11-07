@@ -1,0 +1,5 @@
+{
+  "name": "trip-request-form",
+  "private": true,
+  "scripts": { "test": "node --test test/safety.test.js test/worker.test.js test/i18n.test.js" }
+}

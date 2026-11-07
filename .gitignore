@@ -1,0 +1,8 @@
+# secrets and personal settings - never commit
+.dev.vars
+config.local.json
+*.key.json
+service-account*.json
+node_modules/
+*.log
+.wrangler/

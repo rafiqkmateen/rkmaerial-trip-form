@@ -1,0 +1,6 @@
+{
+  "sheetId": "PUT-YOUR-GOOGLE-SHEET-ID-HERE",
+  "sheetTab": "Form Responses 1",
+  "allowedOrigin": "https://YOUR-SITE.pages.dev",
+  "note": "Copy to config.local.json (ignored by git) and fill in. Secrets (service account key, Turnstile secret) are Cloudflare secrets, never files in this repo."
+}
