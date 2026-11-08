@@ -91,7 +91,6 @@
   "Per traveler": "На одного путешественника",
   "Phone or WhatsApp": "Телефон или WhatsApp",
   "Pickup date": "Дата получения",
-  "Pickup location": "Место получения",
   "Pickup time": "Время получения",
   "Please answer this.": "Пожалуйста, ответьте на этот вопрос.",
   "Please choose one of the options.": "Пожалуйста, выберите один из вариантов.",
@@ -149,5 +148,12 @@
   "Your trip": "Ваша поездка",
   "Your usual": "Ваш обычный",
   "{n} answers still needed": "Осталось ответов: {n}",
-  "The destination must be different from where you leave from.": "Пункт назначения должен отличаться от пункта отправления."
+  "The destination must be different from where you leave from.": "Пункт назначения должен отличаться от пункта отправления.",
+  "Pickup city or airport": "Город или аэропорт получения",
+  "The car is returned to the same place.": "Автомобиль возвращается в том же месте.",
+  "Your car will be at your destination airport and returned there. We estimate the pickup time from your flight arrival and, on a round trip, the return time from your flight home. You choose the exact times with the rental company when you book.": "Ваш автомобиль будет в аэропорту назначения, и вы вернёте его там же. Время получения мы оцениваем по прилёту вашего рейса, а при поездке туда и обратно время возврата — по обратному рейсу. Точное время вы выберете в прокатной компании при бронировании.",
+  "Your flight is one way, so please tell us when you will return the car.": "Ваш рейс в одну сторону, поэтому укажите, когда вы вернёте автомобиль.",
+  "Choose an airport": "Выберите аэропорт",
+  "All airports": "Все аэропорты",
+  "Please choose an airport for this city.": "Выберите аэропорт для этого города."
 };

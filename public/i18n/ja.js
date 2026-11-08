@@ -91,7 +91,6 @@
   "Per traveler": "お一人あたり",
   "Phone or WhatsApp": "電話またはWhatsApp",
   "Pickup date": "受取日",
-  "Pickup location": "受取場所",
   "Pickup time": "受取時間",
   "Please answer this.": "こちらにご回答ください。",
   "Please choose one of the options.": "選択肢から1つ選んでください。",
@@ -149,5 +148,12 @@
   "Your trip": "ご旅行について",
   "Your usual": "普段ご利用のもの",
   "{n} answers still needed": "あと{n}件の回答が必要です",
-  "The destination must be different from where you leave from.": "目的地は出発地と異なる必要があります。"
+  "The destination must be different from where you leave from.": "目的地は出発地と異なる必要があります。",
+  "Pickup city or airport": "受け取りの都市または空港",
+  "The car is returned to the same place.": "車は同じ場所に返却します。",
+  "Your car will be at your destination airport and returned there. We estimate the pickup time from your flight arrival and, on a round trip, the return time from your flight home. You choose the exact times with the rental company when you book.": "お車は到着空港でお受け取りいただき、同じ空港に返却します。受け取り時刻はフライトの到着時刻から、往復の場合は返却時刻を帰りのフライトから見積もります。正確な時刻は、予約時にレンタカー会社とお選びください。",
+  "Your flight is one way, so please tell us when you will return the car.": "フライトは片道ですので、車を返却する日時をお知らせください。",
+  "Choose an airport": "空港を選択",
+  "All airports": "すべての空港",
+  "Please choose an airport for this city.": "この都市の空港を選択してください。"
 };

@@ -41,6 +41,11 @@ const stamp = (tz, now = new Date()) => {
   const p = zoneParts(now, tz);
   return `${+p.month}/${+p.day}/${p.year} ${p.hour}:${p.minute}:${p.second}`;
 };
+// Google Sheets date-time serial for the New York wall-clock time (days since 1899-12-30).
+const stampSerial = (tz, now = new Date()) => {
+  const p = zoneParts(now, tz);
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) / 86400000 + 25569;
+};
 const mdy = iso => { const [y, m, d] = iso.split('-'); return `${+m}/${+d}/${y}`; };
 
 // Turn validated answers into one sheet row (array in COLUMNS order). Pure, so it is easy to test.
@@ -59,14 +64,16 @@ function buildRow(cleanAnswers, { lang = 'en', tz = 'America/New_York', now = ne
     out[f.col || f.id] = v;
   }
   const svc = (a.services || '').split(', ');
+  // Flights plus car: the form does not ask where; the car is at the flight's destination airport.
+  if (svc.includes('Flights') && svc.includes('Car')) out['Pickup location'] = 'Destination airport (from the flight)';
   out['Do you want flight prices?'] = svc.includes('Flights') ? 'Yes' : 'No';
   out['Do you need a rental car?'] = svc.includes('Car') ? 'Yes' : 'No';
   out['Do you want hotel prices?'] = svc.includes('Hotel') ? 'Yes' : 'No';
-  out['Timestamp'] = stamp(tz, now);
+  out['Timestamp'] = stampSerial(tz, now); // a real date-time number, not text
   out['Language'] = (SCHEMA.LANGS.find(l => l.code === lang) || SCHEMA.LANGS[0]).name; // English name, so the report knows what to write in
   out['Looks suspicious?'] = flagged ? 'CHECK' : '';
   out['Handled'] = '';
-  return SCHEMA.COLUMNS.map(h => out[h] === undefined ? '' : String(out[h]));
+  return SCHEMA.COLUMNS.map(h => out[h] === undefined ? '' : (h === 'Timestamp' ? out[h] : String(out[h])));
 }
 
 function originOk(request, env) {
@@ -135,4 +142,4 @@ async function handle(request, env) {
   return env.ASSETS.fetch(request);
 }
 
-module.exports = { fetch: handle, buildRow, todayIso, stamp, _hits: hits };
+module.exports = { fetch: handle, buildRow, todayIso, stamp, stampSerial, _hits: hits };

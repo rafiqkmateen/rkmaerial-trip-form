@@ -91,7 +91,6 @@
   "Per traveler": "Per viaggiatore",
   "Phone or WhatsApp": "Telefono o WhatsApp",
   "Pickup date": "Data di ritiro",
-  "Pickup location": "Luogo di ritiro",
   "Pickup time": "Ora di ritiro",
   "Please answer this.": "Rispondi a questa domanda.",
   "Please choose one of the options.": "Scegli una delle opzioni.",
@@ -149,5 +148,12 @@
   "Your trip": "Il tuo viaggio",
   "Your usual": "Di solito",
   "{n} answers still needed": "Mancano {n} risposte",
-  "The destination must be different from where you leave from.": "La destinazione deve essere diversa dal luogo di partenza."
+  "The destination must be different from where you leave from.": "La destinazione deve essere diversa dal luogo di partenza.",
+  "Pickup city or airport": "Città o aeroporto di ritiro",
+  "The car is returned to the same place.": "L'auto viene restituita nello stesso luogo.",
+  "Your car will be at your destination airport and returned there. We estimate the pickup time from your flight arrival and, on a round trip, the return time from your flight home. You choose the exact times with the rental company when you book.": "La tua auto sarà all'aeroporto di destinazione e verrà restituita lì. Stimiamo l'orario di ritiro dall'arrivo del tuo volo e, in un viaggio di andata e ritorno, l'orario di riconsegna dal volo di ritorno. Gli orari esatti li scegli con la società di noleggio al momento della prenotazione.",
+  "Your flight is one way, so please tell us when you will return the car.": "Il tuo volo è solo andata, quindi indicaci quando restituirai l'auto.",
+  "Choose an airport": "Scegli un aeroporto",
+  "All airports": "Tutti gli aeroporti",
+  "Please choose an airport for this city.": "Scegli un aeroporto per questa città."
 };

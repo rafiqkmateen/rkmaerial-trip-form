@@ -91,7 +91,6 @@
   "Per traveler": "Per reiziger",
   "Phone or WhatsApp": "Telefoon of WhatsApp",
   "Pickup date": "Ophaaldatum",
-  "Pickup location": "Ophaallocatie",
   "Pickup time": "Ophaaltijd",
   "Please answer this.": "Beantwoord deze vraag.",
   "Please choose one of the options.": "Kies een van de opties.",
@@ -149,5 +148,12 @@
   "Your trip": "Jouw reis",
   "Your usual": "Je gebruikelijke",
   "{n} answers still needed": "Nog {n} antwoorden nodig",
-  "The destination must be different from where you leave from.": "De bestemming moet anders zijn dan de plaats van vertrek."
+  "The destination must be different from where you leave from.": "De bestemming moet anders zijn dan de plaats van vertrek.",
+  "Pickup city or airport": "Ophaalstad of -luchthaven",
+  "The car is returned to the same place.": "De auto wordt op dezelfde plaats teruggebracht.",
+  "Your car will be at your destination airport and returned there. We estimate the pickup time from your flight arrival and, on a round trip, the return time from your flight home. You choose the exact times with the rental company when you book.": "Uw auto staat op de luchthaven van bestemming en wordt daar teruggebracht. We schatten de ophaaltijd op basis van de aankomst van uw vlucht en bij een retour de inlevertijd op basis van uw terugvlucht. De exacte tijden kiest u bij het boeken met het verhuurbedrijf.",
+  "Your flight is one way, so please tell us when you will return the car.": "Uw vlucht is enkele reis, laat ons daarom weten wanneer u de auto terugbrengt.",
+  "Choose an airport": "Kies een luchthaven",
+  "All airports": "Alle luchthavens",
+  "Please choose an airport for this city.": "Kies een luchthaven voor deze stad."
 };

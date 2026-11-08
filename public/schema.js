@@ -37,9 +37,59 @@
   const SERVICE_LABELS = { Flights: 'Flights', Car: 'Rental car', Hotel: 'Hotel' };
   const TIMES = ['Any', 'Morning', 'Afternoon', 'Evening', 'Overnight OK'];
 
+  // Cities with more than one big airport. Typing one of these in From or To makes the person choose an airport.
+  // [city, aliases (lower case, no punctuation), [[code, airport name], ...]]
+  const METROS = [
+    ['New York', ['new york', 'new york city', 'new york ny', 'nyc', 'ny'], [['JFK', 'John F. Kennedy'], ['LGA', 'LaGuardia'], ['EWR', 'Newark Liberty']]],
+    ['Washington, D.C.', ['washington', 'washington dc', 'dc', 'washington d c'], [['DCA', 'Reagan National'], ['IAD', 'Dulles'], ['BWI', 'Baltimore/Washington']]],
+    ['Chicago', ['chicago'], [['ORD', "O'Hare"], ['MDW', 'Midway']]],
+    ['Los Angeles', ['los angeles', 'la', 'l a'], [['LAX', 'Los Angeles Intl'], ['BUR', 'Burbank'], ['LGB', 'Long Beach'], ['SNA', 'Orange County'], ['ONT', 'Ontario']]],
+    ['San Francisco Bay Area', ['san francisco', 'sf', 'bay area', 'san francisco bay area'], [['SFO', 'San Francisco Intl'], ['OAK', 'Oakland'], ['SJC', 'San Jose']]],
+    ['Miami', ['miami', 'south florida'], [['MIA', 'Miami Intl'], ['FLL', 'Fort Lauderdale'], ['PBI', 'Palm Beach']]],
+    ['Houston', ['houston'], [['IAH', 'George Bush Intercontinental'], ['HOU', 'Hobby']]],
+    ['Dallas / Fort Worth', ['dallas', 'fort worth', 'dallas fort worth', 'dallas / fort worth', 'dfw'], [['DFW', 'Dallas/Fort Worth'], ['DAL', 'Love Field']]],
+    ['Toronto', ['toronto'], [['YYZ', 'Pearson'], ['YTZ', 'Billy Bishop']]],
+    ['Mexico City', ['mexico city', 'ciudad de mexico', 'cdmx'], [['MEX', 'Benito Juarez'], ['NLU', 'Felipe Angeles']]],
+    ['Medellin', ['medellin', 'medellin colombia'], [['MDE', 'Jose Maria Cordova'], ['EOH', 'Olaya Herrera']]],
+    ['Sao Paulo', ['sao paulo', 'sampa'], [['GRU', 'Guarulhos'], ['CGH', 'Congonhas'], ['VCP', 'Viracopos']]],
+    ['Rio de Janeiro', ['rio de janeiro', 'rio'], [['GIG', 'Galeao'], ['SDU', 'Santos Dumont']]],
+    ['Buenos Aires', ['buenos aires'], [['EZE', 'Ezeiza'], ['AEP', 'Aeroparque']]],
+    ['London', ['london'], [['LHR', 'Heathrow'], ['LGW', 'Gatwick'], ['STN', 'Stansted'], ['LTN', 'Luton'], ['LCY', 'London City']]],
+    ['Paris', ['paris'], [['CDG', 'Charles de Gaulle'], ['ORY', 'Orly']]],
+    ['Milan', ['milan', 'milano'], [['MXP', 'Malpensa'], ['LIN', 'Linate'], ['BGY', 'Bergamo']]],
+    ['Rome', ['rome', 'roma'], [['FCO', 'Fiumicino'], ['CIA', 'Ciampino']]],
+    ['Venice', ['venice', 'venezia'], [['VCE', 'Marco Polo'], ['TSF', 'Treviso']]],
+    ['Stockholm', ['stockholm'], [['ARN', 'Arlanda'], ['BMA', 'Bromma']]],
+    ['Warsaw', ['warsaw', 'warszawa'], [['WAW', 'Chopin'], ['WMI', 'Modlin']]],
+    ['Belfast', ['belfast'], [['BFS', 'Belfast Intl'], ['BHD', 'George Best City']]],
+    ['Istanbul', ['istanbul'], [['IST', 'Istanbul Airport'], ['SAW', 'Sabiha Gokcen']]],
+    ['Moscow', ['moscow', 'moskva'], [['SVO', 'Sheremetyevo'], ['DME', 'Domodedovo'], ['VKO', 'Vnukovo']]],
+    ['Dubai', ['dubai'], [['DXB', 'Dubai Intl'], ['DWC', 'Al Maktoum']]],
+    ['Tokyo', ['tokyo'], [['HND', 'Haneda'], ['NRT', 'Narita']]],
+    ['Osaka', ['osaka'], [['KIX', 'Kansai'], ['ITM', 'Itami']]],
+    ['Seoul', ['seoul'], [['ICN', 'Incheon'], ['GMP', 'Gimpo']]],
+    ['Beijing', ['beijing'], [['PEK', 'Capital'], ['PKX', 'Daxing']]],
+    ['Shanghai', ['shanghai'], [['PVG', 'Pudong'], ['SHA', 'Hongqiao']]],
+    ['Bangkok', ['bangkok'], [['BKK', 'Suvarnabhumi'], ['DMK', 'Don Mueang']]],
+  ];
+  const metroKey = function (s) {
+    return String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[.,]/g, ' ').replace(/\s+/g, ' ').trim();
+  };
+  // The metro this text names (and nothing more), or null. "New York (JFK)" or "JFK" return null.
+  function metroFor(text) {
+    const k = metroKey(text);
+    if (!k) return null;
+    for (let i = 0; i < METROS.length; i++) {
+      if (METROS[i][1].indexOf(k) >= 0) return { city: METROS[i][0], airports: METROS[i][2] };
+    }
+    return null;
+  }
+
   const c = function (id, op, v) { return { id: id, op: op, v: v }; };
   const F = c('services', 'has', 'Flights'), CAR = c('services', 'has', 'Car'), HOTEL = c('services', 'has', 'Hotel');
   const RT = c('tripType', 'eq', 'Round trip');
+  const NOFLIGHT = c('services', 'lacks', 'Flights'), ONEWAY = c('tripType', 'eq', 'One way');
+  const DROP_ASKED = { id: '', op: 'any', v: [NOFLIGHT, ONEWAY] }; // return date/time is typed only for car-only or a one-way flight
 
   // type: text | email | tel | textarea | select | radio | checks | date | time | consent | number | integer
   // col = header in the sheet. free = free text (guarded and checked for suspicious content by the Worker).
@@ -88,12 +138,14 @@
       { id: 'status', col: 'Status level', label: 'Airline or hotel status level (optional)', hint: 'For example Gold or Platinum. Status only, no numbers.', type: 'text', max: 100, free: 1 },
     ] },
     { id: 'car', title: 'Rental car', show: [CAR], fields: [
-      { id: 'pickupLoc', col: 'Pickup location', label: 'Pickup location', type: 'text', req: 1, max: 150, free: 1 },
-      { id: 'dropLoc', col: 'Drop-off location', label: 'Drop-off location', hint: 'Leave empty if it is the same as pickup.', type: 'text', max: 150, free: 1 },
-      { id: 'pickupDate', col: 'Pickup date', label: 'Pickup date', type: 'date', req: 1, future: 1 },
-      { id: 'pickupTime', col: 'Pickup time', label: 'Pickup time', type: 'time', req: 1 },
-      { id: 'dropDate', col: 'Drop-off date', label: 'Drop-off date', type: 'date', req: 1, future: 1, after: 'pickupDate', sameOk: 1 },
-      { id: 'dropTime', col: 'Drop-off time', label: 'Drop-off time', type: 'time', req: 1 },
+      { id: 'carNote', type: 'note', label: 'Your car will be at your destination airport and returned there. We estimate the pickup time from your flight arrival and, on a round trip, the return time from your flight home. You choose the exact times with the rental company when you book.', show: [F] },
+      { id: 'carNoteOneWay', type: 'note', label: 'Your flight is one way, so please tell us when you will return the car.', show: [F, ONEWAY] },
+      { id: 'pickupLoc', col: 'Pickup location', label: 'Pickup city or airport', hint: 'The car is returned to the same place.', type: 'text', req: 1, max: 150, free: 1, show: [NOFLIGHT] },
+      { id: 'dropLoc', col: 'Drop-off location', label: 'Drop-off location', hint: 'Leave empty if it is the same as pickup.', type: 'text', max: 150, free: 1, retired: 1 }, // no longer asked; the column stays so the sheet keeps its layout
+      { id: 'pickupDate', col: 'Pickup date', label: 'Pickup date', type: 'date', req: 1, future: 1, show: [NOFLIGHT] },
+      { id: 'pickupTime', col: 'Pickup time', label: 'Pickup time', type: 'time', req: 1, show: [NOFLIGHT] },
+      { id: 'dropDate', col: 'Drop-off date', label: 'Drop-off date', type: 'date', req: 1, future: 1, after: ['pickupDate', 'depart'], sameOk: 1, show: [DROP_ASKED] },
+      { id: 'dropTime', col: 'Drop-off time', label: 'Drop-off time', type: 'time', req: 1, show: [DROP_ASKED] },
       { id: 'license', col: "Driver's license country", label: "Driver's license country", type: 'select', options: 'countries' },
       { id: 'driverAge', col: 'Driver age', label: 'Driver age', type: 'integer', min: 16, max: 99, inputmode: 'numeric' },
       { id: 'driverResidence', col: "Driver's country of residence", label: "Driver's country of residence", type: 'select', options: 'countries' },
@@ -158,10 +210,12 @@
       case 'lacks': return !(Array.isArray(x) && x.indexOf(cd.v) >= 0);
       case 'gte': return Number(x) >= cd.v;
       case 'countGte': return Array.isArray(x) && x.length >= cd.v;
+      case 'any': return cd.v.some(function (sub) { return testCond(sub, v); });
     }
     return false;
   }
   function isVisible(f, dv) {
+    if (f.retired) return false;
     return (!f.sec.show || f.sec.show.every(function (cd) { return testCond(cd, dv); })) &&
            (!f.show || f.show.every(function (cd) { return testCond(cd, dv); }));
   }
@@ -235,10 +289,19 @@
       const norm = function (s) { return s.toLowerCase().replace(/\s+/g, ' ').trim(); };
       if (norm(clean.from) === norm(clean.to)) errors.to = 'samePlace';
     }
+    // A big city with several airports must be narrowed to an airport (or "all airports") in From and To.
+    ['from', 'to'].forEach(function (id) {
+      if (!errors[id] && clean[id] !== undefined && metroFor(clean[id])) errors[id] = 'pickAirport';
+    });
+    // "All airports" is not allowed at the destination when a rental car is asked (the car needs one airport).
+    if (!errors.to && clean.to !== undefined && /, all airports \(/.test(clean.to) && raw.services.indexOf('Car') >= 0) errors.to = 'pickAirport';
     fieldList.forEach(function (f) {
-      if (!f.after || errors[f.id] || !clean[f.id] || !clean[f.after]) return;
+      if (!f.after || errors[f.id] || !clean[f.id]) return;
       const strict = f.id === 'checkOut';
-      if (strict ? clean[f.id] <= clean[f.after] : clean[f.id] < clean[f.after]) errors[f.id] = 'dateOrder';
+      [].concat(f.after).forEach(function (a) {
+        if (errors[f.id] || !clean[a]) return;
+        if (strict ? clean[f.id] <= clean[a] : clean[f.id] < clean[a]) errors[f.id] = 'dateOrder';
+      });
     });
     // Not asked in these cases, so fill the obvious answer.
     if (clean.budget === 'Yes' && !errors.services) {
@@ -248,5 +311,5 @@
     return { errors: errors, clean: clean };
   }
 
-  return { sections: sections, COLUMNS: COLUMNS, SERVICES: SERVICES, fieldList: fieldList, byId: byId, countries: countries, countryEntries: countryEntries, LANGS: LANGS, optionsOf: optionsOf, derive: derive, isVisible: isVisible, validate: validate, normEmail: normEmail, emailShape: emailShape, addDays: addDays };
+  return { sections: sections, COLUMNS: COLUMNS, SERVICES: SERVICES, fieldList: fieldList, byId: byId, countries: countries, countryEntries: countryEntries, LANGS: LANGS, optionsOf: optionsOf, derive: derive, isVisible: isVisible, METROS: METROS, metroFor: metroFor, validate: validate, normEmail: normEmail, emailShape: emailShape, addDays: addDays };
 });

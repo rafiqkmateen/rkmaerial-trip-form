@@ -91,7 +91,6 @@
   "Per traveler": "Yolcu başına",
   "Phone or WhatsApp": "Telefon veya WhatsApp",
   "Pickup date": "Alış tarihi",
-  "Pickup location": "Alış yeri",
   "Pickup time": "Alış saati",
   "Please answer this.": "Lütfen bu soruyu cevaplayın.",
   "Please choose one of the options.": "Lütfen seçeneklerden birini seçin.",
@@ -149,5 +148,12 @@
   "Your trip": "Seyahatiniz",
   "Your usual": "Genelde kullandığınız",
   "{n} answers still needed": "{n} cevap daha gerekli",
-  "The destination must be different from where you leave from.": "Varış yeri, kalkış yerinden farklı olmalı."
+  "The destination must be different from where you leave from.": "Varış yeri, kalkış yerinden farklı olmalı.",
+  "Pickup city or airport": "Teslim alma şehri veya havalimanı",
+  "The car is returned to the same place.": "Araç aynı yere iade edilir.",
+  "Your car will be at your destination airport and returned there. We estimate the pickup time from your flight arrival and, on a round trip, the return time from your flight home. You choose the exact times with the rental company when you book.": "Aracınız varış havalimanında olacak ve oraya iade edilecek. Teslim alma saatini uçuşunuzun varışına göre, gidiş-dönüş yolculukta ise iade saatini dönüş uçuşunuza göre tahmin ederiz. Kesin saatleri rezervasyon sırasında kiralama şirketiyle siz seçersiniz.",
+  "Your flight is one way, so please tell us when you will return the car.": "Uçuşunuz tek yön, bu yüzden aracı ne zaman iade edeceğinizi bize bildirin.",
+  "Choose an airport": "Bir havalimanı seçin",
+  "All airports": "Tüm havalimanları",
+  "Please choose an airport for this city.": "Lütfen bu şehir için bir havalimanı seçin."
 };

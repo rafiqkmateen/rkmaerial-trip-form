@@ -24,14 +24,16 @@
     badTime: K('Please enter a valid time.'),
     samePlace: K('The destination must be different from where you leave from.'),
     number: K('Please enter a valid number.'),
-    consent: K('Please tick this box to continue.')
+    consent: K('Please tick this box to continue.'),
+    pickAirport: K('Please choose an airport for this city.')
   };
   var X = {
     select: K('Select...'), send: K('Send my request'), sending: K('Sending...'),
     one: K('1 answer still needed'), many: K('{n} answers still needed'), ready: K('Everything looks good.'),
     fail: K('Something went wrong and nothing was sent. Please try again in a minute.'),
     rate: K('Too many tries. Please wait a few minutes and try again.'),
-    usual: K('Your usual'), honey: K('Leave this empty'), langLabel: K('Language')
+    usual: K('Your usual'), honey: K('Leave this empty'), langLabel: K('Language'),
+    pick: K('Choose an airport'), allAirports: K('All airports')
   };
 
   var form = document.getElementById('form');
@@ -44,6 +46,7 @@
   var secEls = {};       // section id -> element
   var shown = {};        // section id -> was visible
   var prefillChoices = {}; // field id -> [values] shown first ("your usual")
+  var pickers = {};        // From/To field id -> its airport picker (select)
 
   function el(tag, cls, text) {
     var e = document.createElement(tag);
@@ -162,6 +165,12 @@
     var err = el('p', 'err'); err.id = errId; err.hidden = true; err.setAttribute('role', 'alert');
     var labelText = T(f.label);
 
+    if (f.type === 'note') {
+      wrap.classList.add('wide');
+      wrap.appendChild(el('p', 'hint note', labelText));
+      els[f.id] = { wrap: wrap, inputs: [], err: err, f: f };
+      return wrap;
+    }
     if (f.type === 'radio' || f.type === 'checks') {
       var fs = el('fieldset');
       fs.appendChild(el('legend', 'lab', labelText));
@@ -216,12 +225,56 @@
       if (f.type === 'email') { inp2.autocapitalize = 'off'; inp2.spellcheck = false; }
       if (f.noPaste) blockPaste(inp2);
       wrap.appendChild(inp2); inputs.push(inp2); if (h2 && !wide) wrap.appendChild(h2); // hints sit under the box so side-by-side boxes line up
+      if (f.id === 'from' || f.id === 'to') { // big city typed: the person must pick an airport (see schema.js METROS)
+        var pk = document.createElement('select');
+        pk.className = 'picker'; pk.hidden = true; pk.setAttribute('aria-label', T(X.pick));
+        pk.addEventListener('change', function () { applyPick(inp2, pk); });
+        wrap.appendChild(pk);
+        pickers[f.id] = pk;
+      }
     }
     var desc = [hintId, errId].filter(Boolean).join(' ');
     inputs.forEach(function (i) { i.setAttribute('aria-describedby', desc); if (f.req) i.setAttribute('aria-required', 'true'); });
     wrap.appendChild(err);
     els[f.id] = { wrap: wrap, inputs: inputs, err: err, f: f };
     return wrap;
+  }
+
+  // Airport picker under From / To. Shows when the text names a city with several airports; picking writes
+  // "City (JFK)" or "City, all airports (JFK, LGA, EWR)" into the box, in English, whatever the page language.
+  function applyPick(input, pk) {
+    if (!pk.value) return;
+    input.value = pk.value;
+    pk.value = '';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  function refreshPickers() {
+    Object.keys(pickers).forEach(function (id) {
+      var pk = pickers[id], e = els[id];
+      var noAll = id === 'to' && (collect().services || []).indexOf('Car') >= 0; // the car needs one destination airport
+      if (noAll && e && /, all airports \(/.test(e.inputs[0].value)) e.inputs[0].value = e.inputs[0].value.replace(/, all airports \(.*$/, ''); // back to the city so the person picks one
+      var m = e && !e.wrap.hidden ? S.metroFor(e.inputs[0].value) : null;
+      if (!m) { pk.hidden = true; pk.dataset.city = ''; return; }
+      var tag = m.city + (noAll ? '|one' : '');
+      if (pk.dataset.city !== tag) {
+        pk.textContent = '';
+        var ph = document.createElement('option'); ph.value = ''; ph.textContent = T(X.pick); pk.appendChild(ph);
+        var codes = m.airports.map(function (a) { return a[0]; });
+        var all = document.createElement('option');
+        all.value = m.city + ', all airports (' + codes.join(', ') + ')';
+        all.textContent = T(X.allAirports) + ' (' + codes.join(', ') + ')';
+        if (!noAll) pk.appendChild(all);
+        m.airports.forEach(function (a) {
+          var o = document.createElement('option');
+          o.value = m.city + ' (' + a[0] + ')';
+          o.textContent = a[0] + ' - ' + a[1];
+          pk.appendChild(o);
+        });
+        pk.dataset.city = tag;
+      }
+      pk.hidden = false;
+    });
   }
 
   // Confirm email: no paste, no drop. The person has to type it again.
@@ -243,7 +296,7 @@
     var v = {};
     S.fieldList.forEach(function (f) {
       var e = els[f.id];
-      if (!e) return;
+      if (!e || f.type === 'note') return;
       if (f.type === 'checks') v[f.id] = e.inputs.filter(function (i) { return i.checked; }).map(function (i) { return i.value; });
       else if (f.type === 'radio') { var c = e.inputs.filter(function (i) { return i.checked; })[0]; v[f.id] = c ? c.value : ''; }
       else if (f.type === 'consent') v[f.id] = e.inputs[0].checked ? 'yes' : '';
@@ -253,7 +306,7 @@
   }
   function setValues(values) {
     Object.keys(values).forEach(function (id) {
-      var e = els[id]; if (!e) return;
+      var e = els[id]; if (!e || e.f.type === 'note') return;
       var val = values[id];
       if (e.f.type === 'checks') { var arr = Array.isArray(val) ? val : String(val || '').split(', '); e.inputs.forEach(function (i) { i.checked = arr.indexOf(i.value) >= 0; }); return; }
       if (typeof val !== 'string') return;
@@ -300,7 +353,11 @@
 
     // return date can not be before departure
     if (els.return) els.return.inputs[0].min = v.depart || localToday();
-    if (els.dropDate) els.dropDate.inputs[0].min = v.pickupDate || localToday();
+    if (els.dropDate) {
+      var earliest = [v.pickupDate, S.isVisible(els.depart.f, dv) ? v.depart : ''].filter(Boolean).sort().pop();
+      els.dropDate.inputs[0].min = earliest || localToday();
+    }
+    refreshPickers();
     if (els.checkOut) els.checkOut.inputs[0].min = v.checkIn || localToday();
 
     var count = 0;
@@ -431,7 +488,7 @@
   // Redraw everything in the current language, keeping what the person already typed.
   function rebuild(values) {
     form.textContent = '';
-    els = {}; secEls = {}; shown = {};
+    els = {}; secEls = {}; shown = {}; pickers = {};
     build();
     if (values) setValues(values);
     applyStatic();

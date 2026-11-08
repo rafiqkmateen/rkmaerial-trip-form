@@ -71,3 +71,5 @@ footer p { margin: 0; }
 .langbar select { width: auto; min-height: 40px; padding: 6px 34px 6px 12px; border-radius: 999px; font-size: .9rem; }
 .ts { display: flex; justify-content: center; margin-bottom: 10px; }
 .ts:empty { display: none; }
+.picker { margin-top: 2px; }
+.note { margin: 0; }

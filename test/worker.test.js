@@ -31,7 +31,10 @@ test('good flights-only request writes exactly one row in column order', async (
   const row = written[0], H = SCHEMA.COLUMNS;
   assert.strictEqual(row.length, H.length);
   const get = h => row[H.indexOf(h)];
-  assert.match(get('Timestamp'), /^\d{1,2}\/\d{1,2}\/\d{4} \d{2}:\d{2}:\d{2}$/);
+  assert.strictEqual(typeof get('Timestamp'), 'number'); // real date-time, not text
+  assert.ok(get('Timestamp') > 46000);
+  // known moment: 2026-11-07 14:47:45 UTC = 09:47:45 New York (EST) = serial 46333.408159722...
+  assert.ok(Math.abs(worker.stampSerial('America/New_York', new Date('2026-11-07T14:47:45Z')) - 46333.408159722225) < 1e-8);
   assert.strictEqual(get('Email'), 'Test@Example.com');
   assert.strictEqual(get('Do you want flight prices?'), 'Yes');
   assert.strictEqual(get('Do you need a rental car?'), 'No');
@@ -206,11 +209,72 @@ test('a browser on the same site (Origin header equal to the site) is accepted',
 
 test('From and To can not be the same place (capitals and spaces ignored)', async () => {
   written.length = 0;
-  const v = base(); v.from = 'Houston'; v.to = '  houston ';
+  const v = base(); v.from = 'Cartagena'; v.to = '  cartagena ';
   const r = await post(v);
   assert.strictEqual(r.status, 400);
   assert.strictEqual((await errorsOf(r)).to, 'samePlace');
   assert.strictEqual(written.length, 0);
-  const ok = base(); ok.from = 'Houston'; ok.to = 'Houston Hobby';
+  const ok = base(); ok.from = 'Cartagena'; ok.to = 'Cartagena Airport';
   assert.strictEqual((await post(ok)).status, 200);
+});
+
+test('a city with several airports must be narrowed to an airport; the picked value is accepted', async () => {
+  for (const typed of ['New York', 'nyc', 'Washington, D.C.', 'London']) {
+    const v = base(); v.from = typed;
+    const r = await post(v);
+    assert.strictEqual(r.status, 400, typed);
+    assert.strictEqual((await errorsOf(r)).from, 'pickAirport', typed);
+  }
+  const v = base(); v.from = 'New York (JFK)'; v.to = 'Washington, D.C., all airports (DCA, IAD, BWI)';
+  assert.strictEqual((await post(v)).status, 200);
+  const w = base(); w.from = 'New York (JFK)'; w.to = 'new york';
+  assert.strictEqual((await errorsOf(await post(w))).to, 'pickAirport');
+});
+
+test('"All airports" at the destination is refused when a car is asked; fine for the start, or without a car', async () => {
+  const v = base(); v.to = 'Washington, D.C., all airports (DCA, IAD, BWI)';
+  assert.strictEqual((await post(v)).status, 200); // flights only
+  v.services = ['Flights', 'Hotel']; Object.assign(v, { hotelLevel: 'Mid-range (about 3 stars)', area: 'anywhere', rooms: '1', guestScore: 'Any' });
+  assert.strictEqual((await post(v)).status, 200); // hotel is priced for the city
+  v.services = ['Flights', 'Car'];
+  assert.strictEqual((await errorsOf(await post(v))).to, 'pickAirport');
+  v.to = 'Washington, D.C. (IAD)'; v.from = 'New York, all airports (JFK, LGA, EWR)';
+  assert.strictEqual((await post(v)).status, 200); // all airports at the start is fine with a car
+});
+
+test('car: flights plus car asks no pickup place or times; round trip needs no return time', async () => {
+  written.length = 0;
+  const v = base(); v.services = ['Flights', 'Car'];
+  assert.strictEqual((await post(v)).status, 200);
+  const H = SCHEMA.COLUMNS, row = written[0];
+  assert.strictEqual(row[H.indexOf('Pickup location')], 'Destination airport (from the flight)');
+  assert.strictEqual(row[H.indexOf('Pickup time')], '');
+  assert.strictEqual(row[H.indexOf('Drop-off time')], '');
+  assert.strictEqual(row[H.indexOf('Drop-off location')], '');
+});
+
+test('car: one-way flight plus car asks only the return date and time; return must not be before departure', async () => {
+  const v = base(); v.services = ['Flights', 'Car']; v.tripType = 'One way'; delete v.return;
+  const e = await errorsOf(await post(v));
+  assert.ok(e.dropDate && e.dropTime);
+  assert.strictEqual(e.pickupDate, undefined); assert.strictEqual(e.pickupTime, undefined); assert.strictEqual(e.pickupLoc, undefined);
+  v.dropDate = SCHEMA.addDays(future, -1); v.dropTime = '10:00';
+  assert.strictEqual((await errorsOf(await post(v))).dropDate, 'dateOrder');
+  v.dropDate = SCHEMA.addDays(future, 5);
+  written.length = 0;
+  assert.strictEqual((await post(v)).status, 200);
+  assert.strictEqual(written[0][SCHEMA.COLUMNS.indexOf('Drop-off time')], '10:00');
+});
+
+test('car only: city or airport, dates and times are all asked; the old drop-off place is ignored', async () => {
+  const v = base(); v.services = ['Car'];
+  const e = await errorsOf(await post(v));
+  assert.ok(e.pickupLoc && e.pickupDate && e.pickupTime && e.dropDate && e.dropTime);
+  assert.strictEqual(e.from, undefined);
+  v.pickupLoc = 'Philadelphia'; v.pickupDate = future; v.pickupTime = '09:00'; v.dropDate = future2; v.dropTime = '17:30'; v.dropLoc = 'SHOULD NOT BE SAVED';
+  written.length = 0;
+  assert.strictEqual((await post(v)).status, 200);
+  const H = SCHEMA.COLUMNS, row = written[0];
+  assert.strictEqual(row[H.indexOf('Pickup location')], 'Philadelphia');
+  assert.strictEqual(row[H.indexOf('Drop-off location')], '');
 });

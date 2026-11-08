@@ -91,7 +91,6 @@
   "Per traveler": "每位旅客",
   "Phone or WhatsApp": "电话或 WhatsApp",
   "Pickup date": "取车日期",
-  "Pickup location": "取车地点",
   "Pickup time": "取车时间",
   "Please answer this.": "请回答此问题。",
   "Please choose one of the options.": "请选择其中一个选项。",
@@ -149,5 +148,12 @@
   "Your trip": "您的行程",
   "Your usual": "您常用的",
   "{n} answers still needed": "还有 {n} 个问题未回答",
-  "The destination must be different from where you leave from.": "目的地不能与出发地相同。"
+  "The destination must be different from where you leave from.": "目的地不能与出发地相同。",
+  "Pickup city or airport": "取车城市或机场",
+  "The car is returned to the same place.": "车辆在同一地点还车。",
+  "Your car will be at your destination airport and returned there. We estimate the pickup time from your flight arrival and, on a round trip, the return time from your flight home. You choose the exact times with the rental company when you book.": "您的车辆将在目的地机场取车，并在同一机场还车。我们会根据航班到达时间估算取车时间；往返行程则根据返程航班估算还车时间。预订时，您可与租车公司确定具体时间。",
+  "Your flight is one way, so please tell us when you will return the car.": "您的航班是单程，请告诉我们您何时还车。",
+  "Choose an airport": "请选择机场",
+  "All airports": "所有机场",
+  "Please choose an airport for this city.": "请为该城市选择一个机场。"
 };

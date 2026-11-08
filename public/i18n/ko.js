@@ -91,7 +91,6 @@
   "Per traveler": "1인당",
   "Phone or WhatsApp": "전화번호 또는 WhatsApp",
   "Pickup date": "픽업 날짜",
-  "Pickup location": "픽업 장소",
   "Pickup time": "픽업 시간",
   "Please answer this.": "이 질문에 답해 주세요.",
   "Please choose one of the options.": "선택지 중에서 하나를 골라 주세요.",
@@ -149,5 +148,12 @@
   "Your trip": "회원님의 여행",
   "Your usual": "평소 이용하는 것",
   "{n} answers still needed": "{n}개 답변이 더 필요해요",
-  "The destination must be different from where you leave from.": "도착지는 출발지와 달라야 합니다."
+  "The destination must be different from where you leave from.": "도착지는 출발지와 달라야 합니다.",
+  "Pickup city or airport": "픽업 도시 또는 공항",
+  "The car is returned to the same place.": "차량은 같은 장소에 반납합니다.",
+  "Your car will be at your destination airport and returned there. We estimate the pickup time from your flight arrival and, on a round trip, the return time from your flight home. You choose the exact times with the rental company when you book.": "차량은 도착 공항에서 인수하고 같은 공항에 반납합니다. 픽업 시간은 항공편 도착 시간으로, 왕복인 경우 반납 시간은 귀국 항공편으로 추정합니다. 정확한 시간은 예약할 때 렌터카 회사와 정하시면 됩니다.",
+  "Your flight is one way, so please tell us when you will return the car.": "항공편이 편도이므로 차량을 반납할 시간을 알려 주세요.",
+  "Choose an airport": "공항 선택",
+  "All airports": "모든 공항",
+  "Please choose an airport for this city.": "이 도시의 공항을 선택해 주세요."
 };
