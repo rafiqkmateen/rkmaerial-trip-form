@@ -71,6 +71,26 @@
     ['Beijing', ['beijing'], [['PEK', 'Capital'], ['PKX', 'Daxing']]],
     ['Shanghai', ['shanghai'], [['PVG', 'Pudong'], ['SHA', 'Hongqiao']]],
     ['Bangkok', ['bangkok'], [['BKK', 'Suvarnabhumi'], ['DMK', 'Don Mueang']]],
+    // Countries and states people type instead of a city. Full names only (no short codes that could mean something else).
+    ['Jamaica', ['jamaica'], [['MBJ', 'Montego Bay'], ['KIN', 'Kingston']]],
+    ['Dominican Republic', ['dominican republic', 'republica dominicana'], [['PUJ', 'Punta Cana'], ['SDQ', 'Santo Domingo'], ['STI', 'Santiago'], ['POP', 'Puerto Plata'], ['LRM', 'La Romana']]],
+    ['Colombia', ['colombia'], [['BOG', 'Bogota'], ['MDE', 'Medellin'], ['CTG', 'Cartagena'], ['CLO', 'Cali'], ['BAQ', 'Barranquilla']]],
+    ['Mexico', ['mexico'], [['CUN', 'Cancun'], ['MEX', 'Mexico City'], ['GDL', 'Guadalajara'], ['SJD', 'Los Cabos'], ['PVR', 'Puerto Vallarta'], ['MTY', 'Monterrey']]],
+    ['Bangladesh', ['bangladesh'], [['DAC', 'Dhaka'], ['CGP', 'Chattogram'], ['ZYL', 'Sylhet']]],
+    ['Pakistan', ['pakistan'], [['KHI', 'Karachi'], ['LHE', 'Lahore'], ['ISB', 'Islamabad']]],
+    ['India', ['india'], [['DEL', 'Delhi'], ['BOM', 'Mumbai'], ['BLR', 'Bengaluru'], ['MAA', 'Chennai'], ['CCU', 'Kolkata'], ['HYD', 'Hyderabad']]],
+    ['Costa Rica', ['costa rica'], [['SJO', 'San Jose'], ['LIR', 'Liberia']]],
+    ['Peru', ['peru'], [['LIM', 'Lima'], ['CUZ', 'Cusco']]],
+    ['Ecuador', ['ecuador'], [['UIO', 'Quito'], ['GYE', 'Guayaquil']]],
+    ['Brazil', ['brazil', 'brasil'], [['GRU', 'Sao Paulo'], ['GIG', 'Rio de Janeiro'], ['BSB', 'Brasilia'], ['SSA', 'Salvador'], ['FOR', 'Fortaleza'], ['REC', 'Recife']]],
+    ['Cuba', ['cuba'], [['HAV', 'Havana'], ['VRA', 'Varadero'], ['SNU', 'Santa Clara']]],
+    ['Bahamas', ['bahamas', 'the bahamas'], [['NAS', 'Nassau'], ['FPO', 'Freeport']]],
+    ['Haiti', ['haiti'], [['PAP', 'Port-au-Prince'], ['CAP', 'Cap-Haitien']]],
+    ['Puerto Rico', ['puerto rico'], [['SJU', 'San Juan'], ['BQN', 'Aguadilla'], ['PSE', 'Ponce']]],
+    ['Florida', ['florida'], [['MCO', 'Orlando'], ['MIA', 'Miami'], ['FLL', 'Fort Lauderdale'], ['TPA', 'Tampa'], ['JAX', 'Jacksonville'], ['RSW', 'Fort Myers']]],
+    ['California', ['california'], [['LAX', 'Los Angeles'], ['SFO', 'San Francisco'], ['SAN', 'San Diego'], ['SJC', 'San Jose'], ['SMF', 'Sacramento']]],
+    ['Texas', ['texas'], [['DFW', 'Dallas/Fort Worth'], ['IAH', 'Houston'], ['AUS', 'Austin'], ['SAT', 'San Antonio'], ['HOU', 'Houston Hobby']]],
+    ['Hawaii', ['hawaii'], [['HNL', 'Honolulu'], ['OGG', 'Maui'], ['KOA', 'Kona'], ['LIH', 'Kauai']]],
   ];
   const metroKey = function (s) {
     return String(s == null ? '' : s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[.,]/g, ' ').replace(/\s+/g, ' ').trim();

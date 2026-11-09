@@ -231,6 +231,21 @@ test('a city with several airports must be narrowed to an airport; the picked va
   assert.strictEqual((await errorsOf(await post(w))).to, 'pickAirport');
 });
 
+test('a country or state typed alone must be narrowed to an airport (Jamaica, Bangladesh, Florida)', async () => {
+  for (const typed of ['Jamaica', 'jamaica ', 'Bangladesh', 'Florida', 'Dominican Republic']) {
+    const v = base(); v.to = typed;
+    const r = await post(v);
+    assert.strictEqual(r.status, 400, typed);
+    assert.strictEqual((await errorsOf(r)).to, 'pickAirport', typed);
+  }
+  const ok = base(); ok.to = 'Jamaica (MBJ)';
+  assert.strictEqual((await post(ok)).status, 200);
+  const all = base(); all.to = 'Jamaica, all airports (MBJ, KIN)';
+  assert.strictEqual((await post(all)).status, 200); // flights only
+  all.services = ['Flights', 'Car'];
+  assert.strictEqual((await errorsOf(await post(all))).to, 'pickAirport'); // a car needs one airport
+});
+
 test('"All airports" at the destination is refused when a car is asked; fine for the start, or without a car', async () => {
   const v = base(); v.to = 'Washington, D.C., all airports (DCA, IAD, BWI)';
   assert.strictEqual((await post(v)).status, 200); // flights only

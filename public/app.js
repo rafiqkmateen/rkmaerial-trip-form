@@ -441,7 +441,16 @@
   // ---- bot check (Cloudflare Turnstile): only on the real site, only when a site key is set in config.js ----
   var siteKey = window.TURNSTILE_SITE_KEY || '';
   var tsOn = !!siteKey && !/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
-  var tsWidget = null, tsToken = '', tsLoading = null;
+  var tsWidget = null, tsToken = '', tsLoading = null, tsHideTimer = null;
+  // The check box sits in the sticky Send bar and covers the form. Hide it 1.5 s after "Success!"; show it again if it expires or fails.
+  function tsShow() {
+    clearTimeout(tsHideTimer);
+    var b = document.getElementById('ts'); if (b) b.style.display = '';
+  }
+  function tsHideSoon() {
+    clearTimeout(tsHideTimer);
+    tsHideTimer = setTimeout(function () { var b = document.getElementById('ts'); if (b) b.style.display = 'none'; }, 1500);
+  }
   function loadTurnstile() {
     if (!tsLoading) tsLoading = new Promise(function (resolve) {
       var s = document.createElement('script');
@@ -461,15 +470,15 @@
       var tl = { zh: 'zh-cn', pt: 'pt-br' }[lang] || lang;
       tsWidget = window.turnstile.render(box, {
         sitekey: siteKey, language: tl, theme: 'auto',
-        callback: function (t) { tsToken = t; },
-        'expired-callback': function () { tsToken = ''; },
-        'error-callback': function () { tsToken = ''; }
+        callback: function (t) { tsToken = t; tsHideSoon(); },
+        'expired-callback': function () { tsToken = ''; tsShow(); },
+        'error-callback': function () { tsToken = ''; tsShow(); }
       });
     });
   }
   function resetTurnstile() {
     if (!tsOn || tsWidget === null || !window.turnstile) return;
-    tsToken = '';
+    tsToken = ''; tsShow();
     try { window.turnstile.reset(tsWidget); } catch (e) { /* ignore */ }
   }
   function withToken(cb) {
